@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio with Notes & Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body, h1,h2,h3,p { margin: 0; padding: 0; }
+    nav { background: #333; padding: 1em; position: sticky; top: 0; }
+    nav ul { display: flex; justify-content: center; list-style: none; }
+    nav a { color: white; margin: 0 1em; text-decoration: none; }
+    section { padding: 2em; }
+    .grid { display: grid; gap: 1em; }
+    @media (min-width: 600px) {
+      .projects-grid, .products-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 900px) {
+      .projects-grid, .products-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .card { border: 1px solid #ccc; padding: 1em; border-radius: 4px; }
+    .controls { margin-bottom: 1em; }
+    label { margin-right: 1em; }
+    textarea, input, select { width: 100%; margin-bottom: .5em; }
+  </style>
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#notes">Notes</a></li>
+      <li><a href="#products">Products</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section id="about">
+    <h1>About Me</h1>
+    <p>Hello! This is Hemanth and i'm frontend developer with a passion for making responsive, user-friendly web applications. Here's my portfolio with dynamic features built using vanilla JavaScript, HTML, and CSS.</p>
+  </section>
+
+  <section id="projects">
+    <h2>Projects</h2>
+    <div class="projects-grid grid">
+      <div class="card">
+        <img src="https://via.placeholder.com/300x200" alt="Project 1">
+        <h3>Project 1</h3>
+        <p>A cool note-taking app powered by localStorage.</p>
+        <a href="#">View Project</a>
+      </div>
+      <div class="card">
+        <img src="https://via.placeholder.com/300x200" alt="Project 2">
+        <h3>Project 2</h3>
+        <p>Product filtering and sorting interface.</p>
+        <a href="#">View Project</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="notes">
+    <h2>Note‑Taking App</h2>
+    <div class="controls">
+      <input type="text" id="note-input" placeholder="New note...">
+      <button onclick="addNote()">Add Note</button>
+      <select id="filter-notes" onchange="renderNotes()">
+        <option value="">All</option>
+        <option value="latest">Newest</option>
+        <option value="oldest">Oldest</option>
+      </select>
+    </div>
+    <div id="note-list"></div>
+  </section>
+
+  <section id="products">
+    <h2>Product Page</h2>
+    <div class="controls">
+      <label>Category:
+        <select id="prod-filter" onchange="renderProducts()">
+          <option value="">All</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Apparel">Apparel</option>
+        </select>
+      </label>
+      <label>Sort by:
+        <select id="prod-sort" onchange="renderProducts()">
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating-desc">Rating</option>
+        </select>
+      </label>
+    </div>
+    <div class="products-grid grid" id="product-list"></div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact Me</h2>
+    <p>Feel free to <a href="mailto:you@example.com">email me</a> or connect via <a href="#">LinkedIn</a>.</p>
+  </section>
+
+<script>
+  // Notes App
+  function getNotes() { return JSON.parse(localStorage.getItem('notes') || '[]'); }
+  function saveNotes(notes) { localStorage.setItem('notes', JSON.stringify(notes)); }
+
+  function renderNotes() {
+    const filter = document.getElementById('filter-notes').value;
+    let notes = getNotes();
+    if (filter === 'latest') notes = notes.reverse();
+    document.getElementById('note-list').innerHTML = notes.map(n => `<div class="card">${n}</div>`).join('');
+  }
+
+  function addNote() {
+    const txt = document.getElementById('note-input').value.trim();
+    if (!txt) return;
+    const notes = getNotes();
+    notes.push(txt);
+    saveNotes(notes);
+    document.getElementById('note-input').value = '';
+    renderNotes();
+  }
+
+  renderNotes();
+
+  // Products Data
+  const products = [
+    { id:1, name:'Smartphone', category:'Electronics', price:699, rating:4.5, link:'#' },
+    { id:2, name:'T-Shirt', category:'Apparel', price:29, rating:4.0, link:'#' },
+    { id:3, name:'Laptop', category:'Electronics', price:999, rating:4.8, link:'#' },
+    { id:4, name:'Jeans', category:'Apparel', price:59, rating:4.3, link:'#' }
+  ];
+
+  function renderProducts() {
+    const cat = document.getElementById('prod-filter').value;
+    const sort = document.getElementById('prod-sort').value;
+    let list = products.filter(p => !cat || p.category === cat);
+
+    if (sort === 'price-asc') list.sort((a,b) => a.price - b.price);
+    if (sort === 'price-desc') list.sort((a,b) => b.price - a.price);
+    if (sort === 'rating-desc') list.sort((a,b) => b.rating - a.rating);
+
+    document.getElementById('product-list').innerHTML = list.map(p => `
+      <div class="card">
+        <h3>${p.name}</h3>
+        <p>Category: ${p.category}</p>
+        <p>Price: $${p.price}</p>
+        <p>Rating: ⭐ ${p.rating}</p>
+        <a href="${p.link}">View Product</a>
+      </div>`).join('');
+  }
+
+  renderProducts();
+</script>
+</body>
+</html>
